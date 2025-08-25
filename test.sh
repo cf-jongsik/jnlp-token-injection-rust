@@ -1,0 +1,2 @@
+#! /bin/bash
+curl --cookie "cookie0=hihi;CF_Authorization=13;cookie1=abcdabcd;cookie2=haha" -H "Content-Type: application/xml" -X POST -d @sample.xml -H "Host: reflector.cloudflareapp.cc" localhost:8787

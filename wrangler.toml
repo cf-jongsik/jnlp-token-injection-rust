@@ -1,0 +1,9 @@
+name = "jnlp-token-injection-rust"
+main = "build/worker/shim.mjs"
+compatibility_date = "2025-08-25"
+
+[vars]
+DEBUG = "false" # it's not boolean, workers only bind it to string. make sure you double quote it. (example: DEBUG="true")
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"

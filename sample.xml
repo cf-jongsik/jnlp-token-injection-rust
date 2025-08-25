@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="https://example.com/app/">
+    <information>
+        <title>Sample Application</title>
+        <vendor>Example Corp</vendor>
+        <description>A sample JNLP application</description>
+    </information>
+
+    <security>
+        <all-permissions/>
+    </security>
+
+    <resources>
+        <j2se version="1.8+"/>
+        <jar href="app.jar" main="true"/>
+    </resources>
+
+    <application-desc main-class="com.example.MainApp">
+        <argument>--config</argument>
+        <argument>production</argument>
+    </application-desc>
+
+    <!-- This parameter will be matched by the regex -->
+    <param name="http_ticket" value="original_token_12345"/>
+
+    <!-- Other parameters that won't be affected -->
+    <param name="server_url" value="https://api.example.com"/>
+    <param name="timeout" value="30000"/>
+
+    <!-- Another http_ticket parameter (if multiple exist) -->
+    <param name="http_ticket" value="backup_token_67890"/>
+
+</jnlp>
+
