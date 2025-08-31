@@ -79,12 +79,67 @@ wrangler build
 
 ### Testing
 
-```bash
-# Run tests
-cargo test
+#### Unit Tests
 
-# Test with sample JNLP file
+```bash
+# Run Rust unit tests
+cargo test
+```
+
+#### Integration Testing with test.sh
+
+The project includes a comprehensive test suite (`test.sh`) that validates the worker's functionality with various scenarios.
+
+##### Features
+
+- **Colored Output**: Visual feedback with color-coded results ( success, warning, error)
+- **Multiple Test Scenarios**: Covers edge cases and common use cases
+- **Debug Mode**: Detailed output with HTTP status and timing information
+- **Environment Configuration**: Customizable host and endpoint settings
+
+##### Test Scenarios
+
+The test suite covers:
+
+1. **Valid CF_Authorization** - Standard token injection with valid cookies
+2. **Special Characters** - URL-encoded tokens with special characters
+3. **Missing Authorization** - Behavior when CF_Authorization is absent
+4. **Empty Authorization** - Handling of empty CF_Authorization values
+5. **Cookie Positioning** - CF_Authorization in different positions within cookie string
+6. **Custom IP Headers** - Testing with CF-Connecting-IP header
+7. **X-Forwarded-For** - IP extraction from X-Forwarded-For header
+
+##### Usage
+
+```bash
+# Run all tests with default settings (localhost:8787)
 ./test.sh
+
+# Run tests with debug output
+./test.sh --debug
+# or
+./test.sh -d
+
+# Use custom host
+HOST=myworker.example.com ./test.sh
+
+# Use custom endpoint
+HOST=localhost:8787 ENDPOINT=/api/jnlp ./test.sh
+
+# Make the script executable (first time only)
+chmod +x test.sh
+```
+
+##### Sample Output
+
+```
+======================================
+JNLP Token Injection Worker Test Suite
+======================================
+
+Test: Valid CF_Authorization
+ Token injection successful
+http_ticket" value="original_token_12345++1234567890-hmactoken++valid-auth-token-abc123"
 ```
 
 ## Deployment
