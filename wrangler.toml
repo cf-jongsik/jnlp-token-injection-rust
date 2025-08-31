@@ -7,3 +7,7 @@ DEBUG = "false" # it's not boolean, workers only bind it to string. make sure yo
 
 [build]
 command = "cargo install -q worker-build && worker-build --release"
+
+[observability]
+enabled = true
+logs.enabled = true
