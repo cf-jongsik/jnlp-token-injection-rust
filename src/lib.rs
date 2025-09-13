@@ -10,24 +10,21 @@ use worker::*;
 const DEFAULT_HMAC_SECRET: &str = "default-secret";
 const HTTP_TICKET_REGEX: &str = r#"(<param\s+name="http_ticket"\s+value=")([^"]+)(")"#;
 
-fn is_debug_enabled(env: &Env) -> bool {
-    env.var("DEBUG")
-        .ok()
-        .and_then(|debug| Some(debug.to_string() == "true"))
-        .unwrap_or_default()
-}
-
 #[event(fetch)]
 async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     console_error_panic_hook::set_once();
 
-    let debug_enabled = is_debug_enabled(&env);
-    let ip_address = extract_client_ip(&req);
+    let debug_enabled = env
+        .var("DEBUG")
+        .map(|value| value.to_string().to_lowercase().eq("true"))
+        .unwrap_or(false);
+
+    let ip_address = extract_client_ip(&req.headers());
     if debug_enabled {
         console_log!("Client IP: {}", ip_address);
     }
 
-    let cookies = parse_cookies(req.headers().get("cookie")?.unwrap_or_default());
+    let cookies = parse_cookies(&req.headers());
     if debug_enabled {
         console_log!("Cookies: {:#?}", cookies);
     }
@@ -56,9 +53,8 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
 
     let hmac_secret = env
         .secret("HMAC_SECRET")
-        .ok()
         .map(|s| s.to_string())
-        .unwrap_or_else(|| DEFAULT_HMAC_SECRET.to_string());
+        .unwrap_or(DEFAULT_HMAC_SECRET.to_string());
 
     if debug_enabled {
         console_log!("hmac_secret: {}", hmac_secret);
@@ -82,13 +78,13 @@ async fn fetch(req: Request, env: Env, _ctx: Context) -> Result<Response> {
     Response::ok(modified_content)
 }
 
-fn extract_client_ip(req: &Request) -> String {
-    req.headers()
+fn extract_client_ip(headers: &Headers) -> String {
+    headers
         .get("CF-Connecting-IP")
         .ok()
         .flatten()
         .or_else(|| {
-            req.headers()
+            headers
                 .get("X-Forwarded-For")
                 .ok()
                 .flatten()
@@ -122,8 +118,12 @@ fn generate_simple_token(ip_address: &str, hmac_secret: &str) -> String {
     format!("{}-{}", time_now, code)
 }
 
-fn parse_cookies(cookie_header: String) -> HashMap<String, String> {
-    cookie_header
+fn parse_cookies(headers: &Headers) -> HashMap<String, String> {
+    headers
+        .get("cookie")
+        .ok()
+        .flatten()
+        .unwrap_or_default()
         .split(';')
         .filter_map(|cookie| {
             cookie
