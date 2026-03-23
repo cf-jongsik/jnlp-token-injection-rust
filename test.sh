@@ -38,7 +38,7 @@ run_test() {
     fi
     
     curl_cmd="$curl_cmd -H \"Content-Type: application/xml\""
-    curl_cmd="$curl_cmd -H \"Host: reflector.cloudflareapp.cc\""
+    curl_cmd="$curl_cmd -H \"Host: reflector.datacloud.win\""
     
     if [ ! -z "$extra_headers" ]; then
         curl_cmd="$curl_cmd $extra_headers"
@@ -79,7 +79,7 @@ run_debug_test() {
     curl -s \
         --cookie "CF_Authorization=test-auth-token-123" \
         -H "Content-Type: application/xml" \
-        -H "Host: reflector.cloudflareapp.cc" \
+        -H "Host: reflector.datacloud.win" \
         -H "CF-Connecting-IP: 192.168.1.100" \
         -X POST \
         -d @${SAMPLE_FILE} \
